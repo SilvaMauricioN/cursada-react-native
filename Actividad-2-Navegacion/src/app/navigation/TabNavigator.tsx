@@ -4,7 +4,6 @@ import ProfileScreen from '../screens/ProfileScreen';
 import { pineColors } from '../theme/Theme';
 import HomeStack from './HomeStack';
 
-// Sin ParamList tipado: se crea el navigator genérico.
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
@@ -23,10 +22,6 @@ export default function TabNavigator() {
         },
       }}
     >
-      {/*
-        Se coloca el HomeStack completo (no HomeScreen directo) para que,
-        al entrar en Details, la barra de tabs siga visible abajo.
-      */}
       <Tab.Screen
         name="HomeTab"
         component={HomeStack}

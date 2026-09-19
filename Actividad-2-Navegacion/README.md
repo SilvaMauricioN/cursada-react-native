@@ -1,50 +1,36 @@
-# Welcome to your Expo app 👋
+# 🌲 MiApp – Tipos de Pinos
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+App móvil hecha con **React Native + Expo** que demuestra navegación con Stack y Tab Navigator, usando **React Native Paper** (Material Design 3) y una paleta de colores verdes minimalista.
 
-## Get started
+## Características
 
-1. Install dependencies
+- Lista de árboles con `FlatList`
+- Pantalla de detalle con parámetros (`route.params`)
+- Navegación por pestañas (Inicio y Perfil)
+- Stack anidado dentro de la pestaña Inicio
+- Estilos centralizados en `sharedStyles.ts`
 
-   ```bash
-   npm install
-   ```
+## Tecnologías
 
-2. Start the app
+- Expo / React Native
+- React Navigation (`native-stack` y `bottom-tabs`)
+- React Native Paper
+- TypeScript
 
-   ```bash
-   npx expo start
-   ```
+Luego escanea el QR con **Expo Go** o abre un emulador (Android / iOS).
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Navegación
 
-## Learn more
+| Método | Uso en la app |
+| --- | --- |
+| `navigation.navigate` | Home → Details (envía el `item`) |
+| `navigation.push` | Details → siguiente elemento |
+| `navigation.goBack` | Volver a la pantalla anterior |
+| `useNavigation` | Componente `Header` (no es una pantalla) |
 
-To learn more about developing your project with Expo, look at the following resources:
+## Autor
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Silva Mauricio – Alumno React Native
+```

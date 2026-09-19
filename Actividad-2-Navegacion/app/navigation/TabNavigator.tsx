@@ -1,41 +1,43 @@
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import ProfileScreen from '../screens/ProfileScreen';
+import { palette } from '../styles/sharedStyles';
 import HomeStack from './HomeStack';
 
 const Tab = createBottomTabNavigator();
 
-function TabNavigator() {
+export default function TabNavigator() {
   return (
     <Tab.Navigator
-      screenOptions={{
-        tabBarActiveTintColor: '#6200ee',
-        tabBarInactiveTintColor: 'gray',
+      screenOptions={({ route }) => ({
         headerShown: false,
-      }}
-    >
-      <Tab.Screen
-        name="HomeTab"
-        component={HomeStack}
-        options={{
-          title: 'Inicio',
-          tabBarLabel: 'Inicio',
-          tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
-        }}
-      />
+        tabBarActiveTintColor: palette.text,
+        tabBarInactiveTintColor: palette.textMuted,
+        tabBarStyle: {
+          backgroundColor: palette.pine800,
+          borderTopColor: palette.pine700,
+          height: 64,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: { fontSize: 12 },
+        tabBarIcon: ({ color, size, focused }) => {
+          const name =
+            route.name === 'HomeTab'
+              ? focused
+                ? 'pine-tree'
+                : 'pine-tree-variant-outline'
+              : focused
+                ? 'account'
+                : 'account-outline';
 
-      <Tab.Screen
-        name="ProfileTab"
-        component={ProfileScreen}
-        options={{
-          title: 'Perfil',
-          tabBarLabel: 'Perfil',
-          tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} color={color} />,
-        }}
-      />
+          return <MaterialCommunityIcons name={name} size={size} color={color} />;
+        },
+      })}
+    >
+      <Tab.Screen name="HomeTab" component={HomeStack} options={{ title: 'Inicio' }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Perfil' }} />
     </Tab.Navigator>
   );
 }
-
-export default TabNavigator;

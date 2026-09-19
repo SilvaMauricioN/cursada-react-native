@@ -10,14 +10,14 @@ export default function ProfileScreen() {
       <View style={styles.header}>
         <Avatar.Icon size={80} icon="account" />
         <Text variant="headlineSmall" style={styles.name}>
-          Javier Lopez
+          Silva Mauricio
         </Text>
       </View>
 
       <Card style={sharedStyles.card}>
         <Card.Content>
-          <Text style={styles.text}>Email: jlopez@gmail.com</Text>
-          <Text style={styles.text}>Rol: Docente React Native</Text>
+          <Text style={styles.text}>Email: silvamauricio@gmail.com</Text>
+          <Text style={styles.text}>Rol: Alumno React Native</Text>
         </Card.Content>
       </Card>
     </ScreenWrapper>

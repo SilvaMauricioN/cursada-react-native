@@ -1,16 +1,16 @@
 export const lightColors = {
   // fondos
-  background: '#FAFAFA',
-  surface: '#F4F4F5',
+  background: '#F5F8FF',
+  surface: '#EAF0FC',
   card: '#FFFFFF',
 
   // textos
-  text: '#18181B',
-  textSecondary: '#52525B',
-  textDisabled: '#A1A1AA',
+  text: '#0F172A',
+  textSecondary: '#475569',
+  textDisabled: '#94A3B8',
 
   // acciones y estados
-  primary: '#18181B',
+  primary: '#2563EB',
   success: '#16A34A',
   successDisabled: '#86EFAC',
   error: '#DC2626',
@@ -18,11 +18,11 @@ export const lightColors = {
   onPrimary: '#FFFFFF', // texto sobre botones de color
 
   // bordes e inputs
-  border: '#E4E4E7',
+  border: '#DBE4F5',
   inputBackground: '#FFFFFF',
-  inputBorder: '#E4E4E7',
-  inputText: '#18181B',
-  placeholder: '#A1A1AA',
+  inputBorder: '#CBD5E8',
+  inputText: '#0F172A',
+  placeholder: '#94A3B8',
 };
 
 // Colors define lo que debe cumplir cualquier tema:
@@ -31,29 +31,29 @@ export type Colors = typeof lightColors;
 
 export const darkColors: Colors = {
   // fondos
-  background: '#09090B',
-  surface: '#18181B',
-  card: '#18181B',
+  background: '#0A1020',
+  surface: '#111A30',
+  card: '#152040',
 
   // textos
-  text: '#FAFAFA',
-  textSecondary: '#A1A1AA',
-  textDisabled: '#52525B',
+  text: '#E8EEFF',
+  textSecondary: '#9FB0D6',
+  textDisabled: '#5A6A90',
 
   // acciones y estados
-  primary: '#FAFAFA',
+  primary: '#4F8BFF',
   success: '#4ADE80',
   successDisabled: '#14532D',
   error: '#F87171',
-  errorBackground: '#2A1215',
-  onPrimary: '#09090B',
+  errorBackground: '#2A1620',
+  onPrimary: '#FFFFFF',
 
   // bordes e inputs
-  border: '#27272A',
-  inputBackground: '#18181B',
-  inputBorder: '#27272A',
-  inputText: '#FAFAFA',
-  placeholder: '#71717A',
+  border: '#22305A',
+  inputBackground: '#111A30',
+  inputBorder: '#2A3A6A',
+  inputText: '#E8EEFF',
+  placeholder: '#6577A3',
 };
 
 export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 };

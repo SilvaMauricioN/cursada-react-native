@@ -1,50 +1,75 @@
-# Welcome to your Expo app 👋
+# Capacidades nativas
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+App de ejemplo hecha con **Expo** y **Expo Router** que muestra cómo usar tres capacidades nativas del celular: cámara, sensores de movimiento y ubicación GPS.
 
-## Get started
+Desde la pantalla de inicio se elige una capacidad y se abre su pantalla de prueba.
 
-1. Install dependencies
+## Pantallas
 
-   ```bash
-   npm install
-   ```
+### Inicio · `app/index.tsx`
 
-2. Start the app
+<img src="docs/home.jpeg" alt="Pantalla de inicio" width="240" />
 
-   ```bash
-   npx expo start
-   ```
+Menú principal. Muestra una tarjeta por cada capacidad y navega a su pantalla al tocarla. Para agregar una capacidad nueva, se suma un objeto a la lista `capabilities` y se crea el archivo con el mismo nombre dentro de `app/`.
 
-In the output, you'll find options to open the app in a
+### Cámara · `app/camera.tsx`
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+<img src="docs/camera.jpeg" alt="Pantalla de cámara" width="240" />
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Pide permiso de cámara y muestra el visor. Permite tomar una foto, cambiar entre cámara trasera y frontal, y ver la foto tomada para repetirla si hace falta.
 
-## Get a fresh project
+Usa: `expo-camera`
 
-When you're ready, run:
+### Sensores · `app/sensors.tsx`
+
+<img src="docs/sensors.jpeg" alt="Pantalla de sensores" width="240" />
+
+Muestra en tiempo real los valores X, Y y Z del **acelerómetro** y el **giroscopio**. Cada sensor se activa y se detiene por separado. Al salir de la pantalla se cancelan las suscripciones para no gastar batería.
+
+Usa: `expo-sensors`
+
+> Los sensores no funcionan en el navegador. En web la pantalla muestra un aviso.
+
+### Ubicación · `app/location.tsx`
+
+<img src="docs/location.jpeg" alt="Pantalla de ubicación" width="240" />
+
+Pide permiso de ubicación y, al tocar el botón, obtiene la posición actual una sola vez. Muestra las coordenadas, la precisión en metros y la altitud (si el dispositivo la entrega).
+
+Usa: `expo-location`
+
+## Cómo probarla
 
 ```bash
-npm run reset-project
+npm install
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Escaneá el código QR con **Expo Go** en tu celular. Cámara y sensores necesitan un dispositivo real.
 
-## Learn more
+Si falta alguna dependencia:
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+npx expo install expo-camera expo-location expo-sensors
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Estructura
 
-## Join the community
+```
+app/
+├── index.tsx      # Inicio
+├── camera.tsx     # Cámara
+├── sensors.tsx    # Sensores
+└── location.tsx   # Ubicación
+docs/              # Imágenes de las pantallas
+```
 
-Join our community of developers creating universal apps.
+## Estilo
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Diseño minimalista con fondo gris claro, tarjetas blancas con borde fino y un color de acento por capacidad:
+
+| Capacidad | Color                                             |
+| --------- | ------------------------------------------------- |
+| Cámara    | `#F2555D`                                         |
+| Sensores  | `#5B5BD6` (acelerómetro) y `#F59E0B` (giroscopio) |
+| Ubicación | `#12A594`                                         |

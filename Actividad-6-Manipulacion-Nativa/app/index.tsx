@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Cada "id" coincide con el nombre de un archivo dentro de /app
 // (camera.tsx -> /camera). Agregar una tarjeta nueva = agregar un objeto acá.
@@ -8,47 +9,65 @@ const capabilities = [
   {
     id: 'camera',
     title: 'Cámara',
-    icon: 'camera',
-    color: '#FF6B6B',
+    icon: 'camera-outline',
+    color: '#F2555D',
     description: 'Tomar fotos',
   },
   {
     id: 'sensors',
     title: 'Sensores',
-    icon: 'phone-portrait',
-    color: '#45B7D1',
+    icon: 'phone-portrait-outline',
+    color: '#5B5BD6',
     description: 'Acelerómetro y giroscopio',
   },
   {
     id: 'location',
     title: 'Ubicación',
-    icon: 'location',
-    color: '#96CEB4',
+    icon: 'location-outline',
+    color: '#12A594',
     description: 'GPS del dispositivo',
   },
 ];
 
 export default function Index() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{
+        paddingTop: insets.top + 32,
+        paddingBottom: insets.bottom + 32,
+        paddingHorizontal: 20,
+      }}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.header}>
         <Text style={styles.title}>Capacidades nativas</Text>
         <Text style={styles.subtitle}>Seleccioná una capacidad para probarla</Text>
       </View>
 
-      <View style={styles.grid}>
+      <View style={styles.list}>
         {capabilities.map((capability) => (
-          <TouchableOpacity
+          <Pressable
             key={capability.id}
-            style={[styles.card, { borderLeftColor: capability.color }]}
+            accessibilityRole="button"
+            accessibilityLabel={`${capability.title}. ${capability.description}`}
             onPress={() => router.push(`/${capability.id}` as any)}
+            style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
           >
-            <Ionicons name={capability.icon as any} size={32} color={capability.color} />
-            <Text style={styles.cardTitle}>{capability.title}</Text>
-            <Text style={styles.cardDescription}>{capability.description}</Text>
-          </TouchableOpacity>
+            <View style={[styles.iconTile, { backgroundColor: `${capability.color}1F` }]}>
+              <Ionicons name={capability.icon as any} size={24} color={capability.color} />
+            </View>
+
+            <View style={styles.cardText}>
+              <Text style={styles.cardTitle}>{capability.title}</Text>
+              <Text style={styles.cardDescription}>{capability.description}</Text>
+            </View>
+
+            <Ionicons name="chevron-forward" size={18} color="#B4B9C4" />
+          </Pressable>
         ))}
       </View>
     </ScrollView>
@@ -58,45 +77,60 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F7F8FA',
   },
   header: {
-    padding: 20,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    marginBottom: 28,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
+    fontSize: 30,
+    fontWeight: '700',
+    letterSpacing: -0.7,
+    color: '#14161B',
+    marginBottom: 6,
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#6B7280',
   },
-  grid: {
-    padding: 16,
+  list: {
+    gap: 12,
   },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 12,
-    borderLeftWidth: 4,
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#E7E9EE',
+    backgroundColor: '#FFFFFF',
     gap: 16,
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+  cardPressed: {
+    backgroundColor: '#F0F1F4',
+    transform: [{ scale: 0.985 }],
+  },
+  iconTile: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardText: {
     flex: 1,
+    gap: 2,
+  },
+  cardTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    letterSpacing: -0.2,
+    color: '#14161B',
   },
   cardDescription: {
-    fontSize: 12,
-    color: '#666',
+    fontSize: 13.5,
+    lineHeight: 19,
+    color: '#6B7280',
   },
 });

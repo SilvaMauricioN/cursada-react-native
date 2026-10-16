@@ -1,9 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function LocationScreen() {
+  const insets = useSafeAreaInsets();
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -46,154 +48,222 @@ export default function LocationScreen() {
 
   if (hasPermission === null) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.messageText}>Solicitando permisos...</Text>
+      <View style={styles.centered}>
+        <Text style={styles.message}>Solicitando permisos...</Text>
       </View>
     );
   }
 
   if (hasPermission === false) {
     return (
-      <View style={styles.container}>
-        <View style={styles.messageContainer}>
-          <Ionicons name="location-outline" size={64} color="#96CEB4" />
-          <Text style={styles.messageTitle}>Permiso de Ubicación Requerido</Text>
-          <Text style={styles.messageText}>
-            Necesitamos acceso a tu ubicación para mostrar tu posición actual.
-          </Text>
-          <TouchableOpacity style={styles.button} onPress={requestPermissions}>
-            <Text style={styles.buttonText}>Solicitar Permiso</Text>
-          </TouchableOpacity>
+      <View style={styles.centered}>
+        <View style={styles.iconTileLarge}>
+          <Ionicons name="location-outline" size={40} color="#12A594" />
         </View>
+        <Text style={styles.messageTitle}>Permiso de ubicación requerido</Text>
+        <Text style={styles.message}>
+          Necesitamos acceso a tu ubicación para mostrar tu posición actual.
+        </Text>
+        <Pressable
+          accessibilityRole="button"
+          onPress={requestPermissions}
+          style={({ pressed }) => [
+            styles.button,
+            styles.buttonCompact,
+            pressed && styles.buttonPressed,
+          ]}
+        >
+          <Text style={styles.buttonText}>Solicitar permiso</Text>
+        </Pressable>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        <Ionicons name="location" size={64} color="#96CEB4" />
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{
+        paddingTop: 32,
+        paddingBottom: insets.bottom + 32,
+        paddingHorizontal: 20,
+      }}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.header}>
         <Text style={styles.title}>Ubicación GPS</Text>
-
-        <TouchableOpacity
-          style={[styles.button, styles.primaryButton]}
-          onPress={getCurrentLocation}
-          disabled={isLoading}
-        >
-          <Ionicons name="locate" size={24} color="#fff" />
-          <Text style={styles.buttonText}>{isLoading ? 'Obteniendo...' : 'Obtener Ubicación'}</Text>
-        </TouchableOpacity>
-
-        {location && (
-          <View style={styles.dataContainer}>
-            <View style={styles.dataCard}>
-              <Ionicons name="navigate" size={32} color="#96CEB4" />
-              <Text style={styles.dataLabel}>Coordenadas</Text>
-              <Text style={styles.dataValue}>
-                {location.coords.latitude.toFixed(6)}, {location.coords.longitude.toFixed(6)}
-              </Text>
-            </View>
-
-            <View style={styles.dataCard}>
-              <Ionicons name="speedometer" size={32} color="#96CEB4" />
-              <Text style={styles.dataLabel}>Precisión</Text>
-              <Text style={styles.dataValue}>
-                ±{location.coords.accuracy?.toFixed(0) || 'N/A'} metros
-              </Text>
-            </View>
-
-            {location.coords.altitude && (
-              <View style={styles.dataCard}>
-                <Ionicons name="trending-up" size={32} color="#96CEB4" />
-                <Text style={styles.dataLabel}>Altitud</Text>
-                <Text style={styles.dataValue}>{location.coords.altitude.toFixed(2)} metros</Text>
-              </View>
-            )}
-          </View>
-        )}
+        <Text style={styles.subtitle}>Obtené la posición actual de tu dispositivo</Text>
       </View>
+
+      <Pressable
+        accessibilityRole="button"
+        onPress={getCurrentLocation}
+        disabled={isLoading}
+        style={({ pressed }) => [
+          styles.button,
+          isLoading && styles.buttonDisabled,
+          pressed && styles.buttonPressed,
+        ]}
+      >
+        <Ionicons name="locate-outline" size={20} color="#FFFFFF" />
+        <Text style={styles.buttonText}>{isLoading ? 'Obteniendo...' : 'Obtener ubicación'}</Text>
+      </Pressable>
+
+      {location && (
+        <View style={styles.list}>
+          <DataCard
+            icon="navigate-outline"
+            label="Coordenadas"
+            value={`${location.coords.latitude.toFixed(6)}, ${location.coords.longitude.toFixed(6)}`}
+          />
+          <DataCard
+            icon="speedometer-outline"
+            label="Precisión"
+            value={`±${location.coords.accuracy?.toFixed(0) ?? 'N/A'} metros`}
+          />
+          {location.coords.altitude != null && (
+            <DataCard
+              icon="trending-up-outline"
+              label="Altitud"
+              value={`${location.coords.altitude.toFixed(2)} metros`}
+            />
+          )}
+        </View>
+      )}
     </ScrollView>
+  );
+}
+
+type DataCardProps = {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  value: string;
+};
+
+function DataCard({ icon, label, value }: DataCardProps) {
+  return (
+    <View style={styles.card}>
+      <View style={styles.iconTile}>
+        <Ionicons name={icon} size={24} color="#12A594" />
+      </View>
+      <View style={styles.cardText}>
+        <Text style={styles.cardLabel}>{label}</Text>
+        <Text style={styles.cardValue}>{value}</Text>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F7F8FA',
   },
-  content: {
-    padding: 20,
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+    padding: 24,
+    backgroundColor: '#F7F8FA',
+  },
+  iconTileLarge: {
+    width: 80,
+    height: 80,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#12A5941F',
+    marginBottom: 20,
+  },
+  messageTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    letterSpacing: -0.5,
+    color: '#14161B',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  message: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#6B7280',
+    textAlign: 'center',
+    maxWidth: 320,
+    marginBottom: 28,
+  },
+  header: {
+    marginBottom: 28,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginTop: 20,
-    marginBottom: 30,
+    fontSize: 30,
+    fontWeight: '700',
+    letterSpacing: -0.7,
+    color: '#14161B',
+    marginBottom: 6,
+  },
+  subtitle: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#6B7280',
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 18,
-    borderRadius: 12,
-    gap: 10,
-    width: '100%',
+    paddingVertical: 16,
+    borderRadius: 14,
+    gap: 8,
+    backgroundColor: '#12A594',
   },
-  primaryButton: {
-    backgroundColor: '#96CEB4',
+  buttonCompact: {
+    paddingHorizontal: 28,
+  },
+  buttonPressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.985 }],
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 18,
+    color: '#FFFFFF',
+    fontSize: 15,
     fontWeight: '600',
   },
-  dataContainer: {
-    width: '100%',
-    marginTop: 30,
+  list: {
+    gap: 12,
+    marginTop: 24,
   },
-  dataCard: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 16,
+  card: {
+    flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#E7E9EE',
+    backgroundColor: '#FFFFFF',
+    gap: 16,
   },
-  dataLabel: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 8,
-    marginBottom: 4,
-  },
-  dataValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    fontFamily: 'monospace',
-  },
-  messageContainer: {
-    flex: 1,
+  iconTile: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    backgroundColor: '#12A5941F',
   },
-  messageTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginTop: 20,
-    marginBottom: 10,
+  cardText: {
+    flex: 1,
+    gap: 2,
   },
-  messageText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 30,
+  cardLabel: {
+    fontSize: 13.5,
+    color: '#6B7280',
+  },
+  cardValue: {
+    fontSize: 17,
+    fontWeight: '600',
+    letterSpacing: -0.2,
+    color: '#14161B',
+    fontVariant: ['tabular-nums'],
   },
 });

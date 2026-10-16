@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Accelerometer, Gyroscope } from 'expo-sensors';
 import { useEffect, useState } from 'react';
-import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type SensorData = {
   x: number;
@@ -15,9 +16,11 @@ export default function SensorsScreen() {
   if (Platform.OS === 'web') {
     return (
       <View style={styles.webNotice}>
-        <Ionicons name="phone-portrait-outline" size={64} color="#45B7D1" />
-        <Text style={styles.title}>Solo disponible en el celular</Text>
-        <Text style={styles.subtitle}>
+        <View style={[styles.iconTileLarge, { backgroundColor: '#5B5BD61F' }]}>
+          <Ionicons name="phone-portrait-outline" size={40} color="#5B5BD6" />
+        </View>
+        <Text style={styles.webTitle}>Solo disponible en el celular</Text>
+        <Text style={styles.webSubtitle}>
           Abrí la app con Expo Go para usar el acelerómetro y el giroscopio.
         </Text>
       </View>
@@ -27,6 +30,7 @@ export default function SensorsScreen() {
 }
 
 function SensorsContent() {
+  const insets = useSafeAreaInsets();
   const [accelerometerData, setAccelerometerData] = useState<SensorData | null>(null);
   const [gyroscopeData, setGyroscopeData] = useState<SensorData | null>(null);
   const [isActive, setIsActive] = useState({
@@ -87,80 +91,103 @@ function SensorsContent() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{
+        paddingTop: 32,
+        paddingBottom: insets.bottom + 32,
+        paddingHorizontal: 20,
+      }}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.header}>
-        <Text style={styles.title}>Sensores del Dispositivo</Text>
-        <Text style={styles.subtitle}>Activa un sensor para ver sus datos en tiempo real</Text>
+        <Text style={styles.title}>Sensores del dispositivo</Text>
+        <Text style={styles.subtitle}>Activá un sensor para ver sus datos en tiempo real</Text>
       </View>
 
-      {/* Acelerómetro */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Ionicons name="phone-portrait" size={32} color="#FF6B6B" />
-          <Text style={styles.cardTitle}>Acelerómetro</Text>
-          {isActive.accelerometer && (
-            <View style={styles.activeIndicator}>
-              <View style={[styles.activeDot, { backgroundColor: '#FF6B6B' }]} />
-              <Text style={styles.activeText}>Activo</Text>
-            </View>
-          )}
-        </View>
-        <View style={styles.dataContainer}>
-          {accelerometerData ? (
-            <>
-              <Text style={styles.dataText}>X: {accelerometerData.x.toFixed(2)}</Text>
-              <Text style={styles.dataText}>Y: {accelerometerData.y.toFixed(2)}</Text>
-              <Text style={styles.dataText}>Z: {accelerometerData.z.toFixed(2)}</Text>
-            </>
-          ) : (
-            <Text style={styles.dataPlaceholder}>Presiona para iniciar</Text>
-          )}
-        </View>
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: isActive.accelerometer ? '#666' : '#FF6B6B' }]}
+      <View style={styles.list}>
+        <SensorCard
+          title="Acelerómetro"
+          icon="phone-portrait-outline"
+          color="#5B5BD6"
+          data={accelerometerData}
+          active={isActive.accelerometer}
           onPress={startAccelerometer}
-        >
-          <Ionicons name={isActive.accelerometer ? 'stop' : 'play'} size={20} color="#fff" />
-          <Text style={styles.buttonText}>
-            {isActive.accelerometer ? 'Detener' : 'Iniciar'} Acelerómetro
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Giroscopio */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Ionicons name="sync" size={32} color="#4ECDC4" />
-          <Text style={styles.cardTitle}>Giroscopio</Text>
-          {isActive.gyroscope && (
-            <View style={styles.activeIndicator}>
-              <View style={[styles.activeDot, { backgroundColor: '#4ECDC4' }]} />
-              <Text style={styles.activeText}>Activo</Text>
-            </View>
-          )}
-        </View>
-        <View style={styles.dataContainer}>
-          {gyroscopeData ? (
-            <>
-              <Text style={styles.dataText}>X: {gyroscopeData.x.toFixed(2)}</Text>
-              <Text style={styles.dataText}>Y: {gyroscopeData.y.toFixed(2)}</Text>
-              <Text style={styles.dataText}>Z: {gyroscopeData.z.toFixed(2)}</Text>
-            </>
-          ) : (
-            <Text style={styles.dataPlaceholder}>Presiona para iniciar</Text>
-          )}
-        </View>
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: isActive.gyroscope ? '#666' : '#4ECDC4' }]}
+        />
+        <SensorCard
+          title="Giroscopio"
+          icon="sync-outline"
+          color="#F59E0B"
+          data={gyroscopeData}
+          active={isActive.gyroscope}
           onPress={startGyroscope}
-        >
-          <Ionicons name={isActive.gyroscope ? 'stop' : 'play'} size={20} color="#fff" />
-          <Text style={styles.buttonText}>
-            {isActive.gyroscope ? 'Detener' : 'Iniciar'} Giroscopio
-          </Text>
-        </TouchableOpacity>
+        />
       </View>
     </ScrollView>
+  );
+}
+
+type SensorCardProps = {
+  title: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  color: string;
+  data: SensorData | null;
+  active: boolean;
+  onPress: () => void;
+};
+
+function SensorCard({ title, icon, color, data, active, onPress }: SensorCardProps) {
+  const axes: { label: string; value: number | undefined }[] = [
+    { label: 'X', value: data?.x },
+    { label: 'Y', value: data?.y },
+    { label: 'Z', value: data?.z },
+  ];
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHeader}>
+        <View style={[styles.iconTile, { backgroundColor: `${color}1F` }]}>
+          <Ionicons name={icon} size={24} color={color} />
+        </View>
+        <Text style={styles.cardTitle}>{title}</Text>
+        {active && (
+          <View style={[styles.statusPill, { backgroundColor: `${color}1F` }]}>
+            <View style={[styles.statusDot, { backgroundColor: color }]} />
+            <Text style={[styles.statusText, { color }]}>Activo</Text>
+          </View>
+        )}
+      </View>
+
+      <View style={styles.dataRow}>
+        {axes.map((axis) => (
+          <View key={axis.label} style={styles.dataCell}>
+            <Text style={styles.dataLabel}>{axis.label}</Text>
+            <Text style={[styles.dataValue, axis.value === undefined && styles.dataEmpty]}>
+              {axis.value === undefined ? '–' : axis.value.toFixed(2)}
+            </Text>
+          </View>
+        ))}
+      </View>
+
+      <Pressable
+        accessibilityRole="button"
+        onPress={onPress}
+        style={({ pressed }) => [
+          styles.button,
+          active ? styles.buttonActive : { backgroundColor: color },
+          pressed && styles.buttonPressed,
+        ]}
+      >
+        <Ionicons
+          name={active ? 'stop' : 'play'}
+          size={18}
+          color={active ? '#14161B' : '#FFFFFF'}
+        />
+        <Text style={[styles.buttonText, active && styles.buttonTextActive]}>
+          {active ? 'Detener' : 'Iniciar'} {title.toLowerCase()}
+        </Text>
+      </Pressable>
+    </View>
   );
 }
 
@@ -171,93 +198,144 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 24,
     gap: 12,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F7F8FA',
+  },
+  iconTileLarge: {
+    width: 80,
+    height: 80,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  webTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    letterSpacing: -0.5,
+    color: '#14161B',
+    textAlign: 'center',
+  },
+  webSubtitle: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#6B7280',
+    textAlign: 'center',
+    maxWidth: 320,
   },
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F7F8FA',
   },
   header: {
-    padding: 20,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    marginBottom: 28,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
+    fontSize: 30,
+    fontWeight: '700',
+    letterSpacing: -0.7,
+    color: '#14161B',
+    marginBottom: 6,
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#6B7280',
+  },
+  list: {
+    gap: 12,
   },
   card: {
-    backgroundColor: '#fff',
-    margin: 16,
-    padding: 20,
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#45B7D1',
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#E7E9EE',
+    backgroundColor: '#FFFFFF',
+    gap: 16,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
-    gap: 12,
+    gap: 16,
+  },
+  iconTile: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   cardTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
     flex: 1,
+    fontSize: 17,
+    fontWeight: '600',
+    letterSpacing: -0.2,
+    color: '#14161B',
   },
-  activeIndicator: {
+  statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 999,
   },
-  activeDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
-  activeText: {
-    fontSize: 12,
-    color: '#666',
+  statusText: {
+    fontSize: 12.5,
+    fontWeight: '600',
+  },
+  dataRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  dataCell: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 14,
+    backgroundColor: '#F7F8FA',
+    gap: 2,
+  },
+  dataLabel: {
+    fontSize: 12.5,
     fontWeight: '500',
+    color: '#6B7280',
   },
-  dataContainer: {
-    backgroundColor: '#F5F5F5',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 16,
-    minHeight: 80,
-    justifyContent: 'center',
+  dataValue: {
+    fontSize: 20,
+    fontWeight: '600',
+    letterSpacing: -0.4,
+    color: '#14161B',
+    fontVariant: ['tabular-nums'],
   },
-  dataText: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 4,
-    fontFamily: 'monospace',
-  },
-  dataPlaceholder: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
+  dataEmpty: {
+    color: '#B4B9C4',
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 12,
-    borderRadius: 8,
+    paddingVertical: 14,
+    borderRadius: 14,
     gap: 8,
   },
+  buttonActive: {
+    backgroundColor: '#F0F1F4',
+  },
+  buttonPressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.985 }],
+  },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: '#FFFFFF',
+    fontSize: 15,
     fontWeight: '600',
+  },
+  buttonTextActive: {
+    color: '#14161B',
   },
 });
